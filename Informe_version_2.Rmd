@@ -1,0 +1,46 @@
+---
+title: |
+  ![](logo_facso.png){width=2.5in} \linebreak  \linebreak \linebreak  "Gobernanza en Crisis Sanitaria: Un análisis sobre la legitimidad de las medidas sanitarias adoptadas por el Gobierno de Chile"  \linebreak   \linebreak   
+subtitle: |
+  | Estadística Multivariada 2021
+  | Cátedra dictada por Prof. Juan Carlos Castillo
+  | Apoyo docente Valentina Andrade
+  | Ayudante Nicolás Godoy \linebreak  
+author: | 
+ | Vicente Campos Aparicio, Carolina Carrillo Devia, Javier González Ortiz,
+ | Matías Martini Serrano y Maria Jesús Meléndez Berndt   
+date: "6/7/2021"
+csl: apa.csl
+output: pdf_document
+bibliography: Bib_Informe_EM.bib
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE) 
+````
+\newpage
+# Resumen {-}
+Frente al problema público de la influencia de la participación social en la aplicación de políticas sanitarias, y la importancia de la cooperación ciudadana particularmente en la pandemia de COVID-19 [@world_health_organization_covid-19_2020], se busca explicar el grado de acuerdo de los sujetos con las medidas sanitarias adoptadas por el Gobierno a través de la aplicación de modelos de regresión múltiple. En este sentido, se propone determinar el efecto de la constancia en la información sobre el avance del COVID-19, la percepción de desigualdad frente a la pandemia y la percepción de peligro ante el COVID-19, en el grado de legitimidad que los sujetos le adjudican a las medidas sanitarias adoptadas por el Gobierno. 
+Para ello se utilizan los datos de la encuesta transversal a hogares MOVID-Impact, realizada por el Centro UC de Encuestas y Estudios Longitudinales por encargo del proyecto académico CoV-IMPACT-C, liderado por la Universidad de Chile. La base de datos cuenta con 1216 casos tras el tratamiento de casos perdidos. 
+Los resultados a partir de modelos de regresión múltiple y logística, dan cuenta de que las personas que perciben algún nivel de riesgo ante el coronavirus legitimarían en mayor grado las medidas sanitarias adoptadas por el Gobierno, que aquellas personas que estiman como “Nada peligroso” la enfermedad provocada por el COVID-19. En cuanto a las hipótesis sobre el efecto en la variable dependiente de la constancia en la información sobre el avance del COVID-19 y la percepción de desigualdad frente a la pandemia, los resultados no son estadísticamente significativos.
+
+\newpage
+# 1. Introducción
+La pandemia de COVID-19 ha puesto de manifiesto la fragilidad de los servicios de salud y los sistemas de salud pública en todo el mundo. Distintos gobiernos han debido tomar medidas sanitarias extraordinarias, y en Chile se ha optado por la implementación de cuarentenas parciales y totales, entre otras medidas. En este contexto, la OMS señala la importancia de la colaboración de las personas para un funcionamiento eficaz de las medidas sanitarias adoptadas [@world_health_organization_covid-19_2020]. El desconocimiento respecto a esta pandemia dejó en evidencia que, en un comienzo, en realidad ningún gobierno sabía realmente cuál era la forma más óptima de enfrentar esta crisis sanitaria. Hoy en día contamos con evidencia empírica de distintos países que lograron enfrentar efectivamente la propagación de la pandemia como son los casos de China y Noruega. La principal lección aprendida del caso noruego es que, a pesar de la falta de preparación en algunos aspectos, el gobierno logró controlar la pandemia con bastante rapidez y eficacia bajo un estilo de toma de decisiones colaborativa, una estrategia de comunicación efectiva, muchos recursos y un alto nivel de confianza de los ciudadanos con el gobierno [@christensen_comparing_2021]. De la misma forma, para el caso de China, el desempeño de la gestión de crisis durante los procesos de manejo de virus está relacionado con la relación dinámica entre la capacidad de gobernanza, para coordinar, analizar, regular y entregar, y la legitimidad del gobierno [@christensen_balancing_2020]. En este ámbito, la principal enseñanza que muestran ambos casos resalta que la legitimidad de gobernanza de las instituciones desde las cuales emanan dichas medidas sanitarias posee gran relevancia, pues esta constituye un factor fundamental en las expectativas y apoyo hacia la gestión llevada a cabo por las autoridades. Una muestra de ello es que las nuevas normas sobre medidas de lockdown, uso de implementos de protección y herramientas de trazabilidad que dependen de la participación voluntaria de las personas han sido más fáciles de implementar en contextos de mayor confianza en las instituciones y las políticas [@oecd_changing_2015 @linn_fleischer_why_2020]. La estrategia de comunicación que se ha usado en Chile se denominó bajo el programa “Paso a Paso”, para el cual diariamente mediante conferencias de prensa y las redes sociales del Ministerio de Salud, se comunica el reporte de la situación del país mediante voceros del mismo ministerio.
+
+El término de legitimidad de la gobernanza se relaciona con el grado de apoyo cultural a una organización (Meyer y Scott, 1983, citado en Christensen, T., y Ma, L., 2021), en nuestro caso a la gestión de crisis. Esta se ocupa principalmente de la relación entre el gobierno y los ciudadanos, entendiéndose como la percepción de les ciudadanes de si las acciones de las autoridades se consideran apropiadas dentro de ciertos sistemas de normas, creencias y valores construidos social y culturalmente. Una forma de abordar el tema de la legitimidad gubernamental la conceptualiza a partir de tres dimensiones: input, throughput y output legitimacy (Scharpf, 1999; Schmidt, 2013, citado en Christensen, T., y Ma, L., 2021). La legitimacy input refleja el grado en que los ciudadanos apoyan los procesos políticos y los partidos, así como cómo ven la calidad de su propia participación. La legitimacy throughput se ocupa de los procesos dentro del aparato gubernamental y de cuán abiertos, justos e imparciales se ven. Dentro de este apartado se manifiesta la confianza como un elemento fundamental en el desarrollo de políticas públicas en tiempos de pandemia (Khemani, S. 2020). La legitimacy output se ocupa de las políticas, los medios, las medidas y el desempeño que surgen del aparato público y se dirigen hacia la sociedad, y cómo son percibidos por los ciudadanos.
+
+En virtud de este esquema, resulta de sumo interés, en primer lugar, analizar los efectos de la percepción de desigualdad en la protección y el acceso a servicios de salud en tiempos de pandemia en Chile respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno. Esto bajo la lógica de que esta percepción de desigualdad se vincula con la throughout legitimacy en términos de confianza con el aparato gubernamental. En segundo lugar, relacionar la constancia con la que las personas se informan sobre los avances del coronavirus, junto a la percepción de peligro que tienen sobre el COVID-19 respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno se ve justificado en cuanto las primeras dos variables se ven relacionadas con la dimensión de output legitimacy como medios para analizar el impacto de las estrategias comunicativas del gobierno.
+
+En adición a lo anteriormente presentado, el impacto del sexo y la edad en las consecuencias sociales y económicas de la Pandemia también ha sido ampliamente estudiado. Estudios señalan que los efectos en el trabajo remunerado y en las labores reproductivas han sido mayores para las mujeres (Lafortune, 2020; Comisión Interamericana de Mujeres, 2020; Valenzuela y Wendel, 2021; Arriagada, 2021), así como las medidas sanitarias más estrictas han aumentado la violencia de género en sus distintas manifestaciones (Medina et al., 2020; Morales-Carrero, 2021). Asimismo, el riesgo a la salud que implica el COVID-19 aumenta en las personas mayores (Romero et al., 2020), mientras que la caída en la ocupación laboral ha sido mayor en las personas más jóvenes, lo que podría influir en una percepción diferenciada de los efectos de las medidas sanitarias por grupo etario (Weller, 2020).
+
+
+\newpage
+
+# Referencias {-}
+
+<div id="refs"></div>
+
+# Anexo {-}
+
+
+
