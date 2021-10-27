@@ -1,6 +1,6 @@
 ---
 title: |
-  ![](logo_facso.png){width=2.5in} \linebreak  \linebreak \linebreak  "Gobernanza en Crisis Sanitaria: Un análisis sobre la legitimidad de las medidas sanitarias adoptadas por el Gobierno de Chile"  \linebreak   \linebreak   
+  ![](input/images/logo_facso.png){width=2.5in} \linebreak  \linebreak \linebreak  "Gobernanza en Crisis Sanitaria: Un análisis sobre la legitimidad de las medidas sanitarias adoptadas por el Gobierno de Chile"  \linebreak   \linebreak   
 subtitle: |
   | Estadística Multivariada 2021
   | Cátedra dictada por Prof. Juan Carlos Castillo
@@ -9,14 +9,29 @@ subtitle: |
 author: | 
  | Vicente Campos Aparicio, Carolina Carrillo Devia, Javier González Ortiz,
  | Matías Martini Serrano y Maria Jesús Meléndez Berndt   
-date: "6/7/2021"
-csl: apa.csl
+date: "06/07/2021"
+csl: 'input/bib/apa.csl'
 output: pdf_document
-bibliography: Bib_Informe_EM.bib
+bibliography: 'input/bib/Bib_Informe_EM.bib'
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE) 
-````
+knitr::opts_chunk$set(comment=NA, prompt=FALSE, cache=FALSE, echo=TRUE, results='asis', message = F, warning = F)
+```
+
+```{r load, echo = F}
+# 1. Cargar librarias
+# install.packages("pacman")
+# library(pacman)
+pacman::p_load(dplyr, stargazer, summarytools, kableExtra,
+               sjmisc, sjPlot, ggpubr, gridExtra, webshot,
+               corrplot, texreg, ggmosaic, finalfit,
+               DescTools)
+# 2. Cargar base de datos
+rm(list = ls())
+options(scipen=999)
+load("input/data/proc/proc_movid.RData")
+```
+
 \newpage
 # Resumen {-}
 Frente al problema público de la influencia de la participación social en la aplicación de políticas sanitarias, y la importancia de la cooperación ciudadana particularmente en la pandemia de COVID-19 [@world_health_organization_covid-19_2020], se busca explicar el grado de acuerdo de los sujetos con las medidas sanitarias adoptadas por el Gobierno a través de la aplicación de modelos de regresión múltiple. En este sentido, se propone determinar el efecto de la constancia en la información sobre el avance del COVID-19, la percepción de desigualdad frente a la pandemia y la percepción de peligro ante el COVID-19, en el grado de legitimidad que los sujetos le adjudican a las medidas sanitarias adoptadas por el Gobierno. 
@@ -24,17 +39,88 @@ Para ello se utilizan los datos de la encuesta transversal a hogares MOVID-Impac
 Los resultados a partir de modelos de regresión múltiple y logística, dan cuenta de que las personas que perciben algún nivel de riesgo ante el coronavirus legitimarían en mayor grado las medidas sanitarias adoptadas por el Gobierno, que aquellas personas que estiman como “Nada peligroso” la enfermedad provocada por el COVID-19. En cuanto a las hipótesis sobre el efecto en la variable dependiente de la constancia en la información sobre el avance del COVID-19 y la percepción de desigualdad frente a la pandemia, los resultados no son estadísticamente significativos.
 
 \newpage
-# 1. Introducción
+# Introducción
 La pandemia de COVID-19 ha puesto de manifiesto la fragilidad de los servicios de salud y los sistemas de salud pública en todo el mundo. Distintos gobiernos han debido tomar medidas sanitarias extraordinarias, y en Chile se ha optado por la implementación de cuarentenas parciales y totales, entre otras medidas. En este contexto, la OMS señala la importancia de la colaboración de las personas para un funcionamiento eficaz de las medidas sanitarias adoptadas [@world_health_organization_covid-19_2020]. El desconocimiento respecto a esta pandemia dejó en evidencia que, en un comienzo, en realidad ningún gobierno sabía realmente cuál era la forma más óptima de enfrentar esta crisis sanitaria. Hoy en día contamos con evidencia empírica de distintos países que lograron enfrentar efectivamente la propagación de la pandemia como son los casos de China y Noruega. La principal lección aprendida del caso noruego es que, a pesar de la falta de preparación en algunos aspectos, el gobierno logró controlar la pandemia con bastante rapidez y eficacia bajo un estilo de toma de decisiones colaborativa, una estrategia de comunicación efectiva, muchos recursos y un alto nivel de confianza de los ciudadanos con el gobierno [@christensen_comparing_2021]. De la misma forma, para el caso de China, el desempeño de la gestión de crisis durante los procesos de manejo de virus está relacionado con la relación dinámica entre la capacidad de gobernanza, para coordinar, analizar, regular y entregar, y la legitimidad del gobierno [@christensen_balancing_2020]. En este ámbito, la principal enseñanza que muestran ambos casos resalta que la legitimidad de gobernanza de las instituciones desde las cuales emanan dichas medidas sanitarias posee gran relevancia, pues esta constituye un factor fundamental en las expectativas y apoyo hacia la gestión llevada a cabo por las autoridades. Una muestra de ello es que las nuevas normas sobre medidas de lockdown, uso de implementos de protección y herramientas de trazabilidad que dependen de la participación voluntaria de las personas han sido más fáciles de implementar en contextos de mayor confianza en las instituciones y las políticas [@oecd_changing_2015 @linn_fleischer_why_2020]. La estrategia de comunicación que se ha usado en Chile se denominó bajo el programa “Paso a Paso”, para el cual diariamente mediante conferencias de prensa y las redes sociales del Ministerio de Salud, se comunica el reporte de la situación del país mediante voceros del mismo ministerio.
 
-El término de legitimidad de la gobernanza se relaciona con el grado de apoyo cultural a una organización (Meyer y Scott, 1983, citado en Christensen, T., y Ma, L., 2021), en nuestro caso a la gestión de crisis. Esta se ocupa principalmente de la relación entre el gobierno y los ciudadanos, entendiéndose como la percepción de les ciudadanes de si las acciones de las autoridades se consideran apropiadas dentro de ciertos sistemas de normas, creencias y valores construidos social y culturalmente. Una forma de abordar el tema de la legitimidad gubernamental la conceptualiza a partir de tres dimensiones: input, throughput y output legitimacy (Scharpf, 1999; Schmidt, 2013, citado en Christensen, T., y Ma, L., 2021). La legitimacy input refleja el grado en que los ciudadanos apoyan los procesos políticos y los partidos, así como cómo ven la calidad de su propia participación. La legitimacy throughput se ocupa de los procesos dentro del aparato gubernamental y de cuán abiertos, justos e imparciales se ven. Dentro de este apartado se manifiesta la confianza como un elemento fundamental en el desarrollo de políticas públicas en tiempos de pandemia (Khemani, S. 2020). La legitimacy output se ocupa de las políticas, los medios, las medidas y el desempeño que surgen del aparato público y se dirigen hacia la sociedad, y cómo son percibidos por los ciudadanos.
+El término de legitimidad de la gobernanza se relaciona con el grado de apoyo cultural a una organización [@christensen_comparing_2021], en nuestro caso a la gestión de crisis. Esta se ocupa principalmente de la relación entre el gobierno y los ciudadanos, entendiéndose como la percepción de les ciudadanes de si las acciones de las autoridades se consideran apropiadas dentro de ciertos sistemas de normas, creencias y valores construidos social y culturalmente. Una forma de abordar el tema de la legitimidad gubernamental la conceptualiza a partir de tres dimensiones: input, throughput y output legitimacy (Scharpf, 1999; Schmidt, 2013, citado en Christensen, T., y Ma, L., 2021). La _legitimacy input_ refleja el grado en que los ciudadanos apoyan los procesos políticos y los partidos, así como cómo ven la calidad de su propia participación. La _legitimacy throughput_ se ocupa de los procesos dentro del aparato gubernamental y de cuán abiertos, justos e imparciales se ven. Dentro de este apartado se manifiesta la confianza como un elemento fundamental en el desarrollo de políticas públicas en tiempos de pandemia [@khemani_opportunity_2020]. La _legitimacy output_ se ocupa de las políticas, los medios, las medidas y el desempeño que surgen del aparato público y se dirigen hacia la sociedad, y cómo son percibidos por los ciudadanos.
 
-En virtud de este esquema, resulta de sumo interés, en primer lugar, analizar los efectos de la percepción de desigualdad en la protección y el acceso a servicios de salud en tiempos de pandemia en Chile respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno. Esto bajo la lógica de que esta percepción de desigualdad se vincula con la throughout legitimacy en términos de confianza con el aparato gubernamental. En segundo lugar, relacionar la constancia con la que las personas se informan sobre los avances del coronavirus, junto a la percepción de peligro que tienen sobre el COVID-19 respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno se ve justificado en cuanto las primeras dos variables se ven relacionadas con la dimensión de output legitimacy como medios para analizar el impacto de las estrategias comunicativas del gobierno.
+En virtud de este esquema, resulta de sumo interés analizar el efecto que algunos factores, correspondientes a las tres dimensiones de legitimidad mencionadas, tienen con la legitimidad global respecto a las medidas sanitarias gubernamentales. En primer lugar, relacionar la fatiga en la información sobre los avances del coronavirus, respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno, considerando que la valoración positiva de la participación en los procesos políticos ( _input legitimacy_ ) está relacionada con el acceso oportuno de la población a la información contingente. En segundo lugar, se propone analizar los efectos de la percepción de desigualdad en la protección y el acceso a servicios de salud en tiempos de pandemia en Chile respecto al grado de legitimidad que se tiene sobre las medidas sanitarias del gobierno. Esto bajo la lógica de que esta percepción de desigualdad se vincula con la _throughout legitimacy_ en términos de confianza en los procesos del aparato gubernamental. En tercer lugar, es de interés analizar el efecto de la percepción de riesgo que las personas tienen sobre el COVID-19 respecto al grado de legitimidad que le adjudican a las medidas sanitarias del gobierno. Esto último se relaciona con la dimensión de _output legitimacy_, en tanto permite evaluar el impacto de las estrategias del gobierno en la dimensión subjetiva del riesgo percibido.
 
-En adición a lo anteriormente presentado, el impacto del sexo y la edad en las consecuencias sociales y económicas de la Pandemia también ha sido ampliamente estudiado. Estudios señalan que los efectos en el trabajo remunerado y en las labores reproductivas han sido mayores para las mujeres (Lafortune, 2020; Comisión Interamericana de Mujeres, 2020; Valenzuela y Wendel, 2021; Arriagada, 2021), así como las medidas sanitarias más estrictas han aumentado la violencia de género en sus distintas manifestaciones (Medina et al., 2020; Morales-Carrero, 2021). Asimismo, el riesgo a la salud que implica el COVID-19 aumenta en las personas mayores (Romero et al., 2020), mientras que la caída en la ocupación laboral ha sido mayor en las personas más jóvenes, lo que podría influir en una percepción diferenciada de los efectos de las medidas sanitarias por grupo etario (Weller, 2020).
+```{r fig1, echo = F, fig.cap="Modelo de _input-throughput-output legitimacy_ aplicado a la Gobernanza en Crisis Sanitaria. Fuente: Elaboración propia."}
+knitr::include_graphics("input/images/legitimacy_model.png")
+```
+
+En adición a lo anteriormente presentado, el impacto del sexo y la edad en las consecuencias sociales y económicas de la Pandemia también ha sido ampliamente estudiado. Estudios señalan que los efectos en el trabajo remunerado y en las labores reproductivas han sido mayores para las mujeres [@blanca_borquez_organizacion_2021], así como las medidas sanitarias más estrictas han aumentado la violencia de género en sus distintas manifestaciones [@moreno-estupinan_violencia_2020]. Asimismo, el riesgo a la salud que implica el COVID-19 aumenta en las personas mayores [@romero_starke_age-related_2020], mientras que la caída en la ocupación laboral ha sido mayor en las personas más jóvenes, lo que podría influir en una percepción diferenciada de los efectos de las medidas sanitarias por grupo etario.
 
 
 \newpage
+
+# Objetivos e hipótesis
+El objetivo general que guía la investigación es analizar el efecto de la fatiga en la información sobre el avance del COVID-19, la percepción de desigualdad en el sistema de salud frente a la Pandemia y la percepción de riesgo ante el COVID-19, en la legitimidad de las medidas sanitarias gubernamentales.
+
+Se proponen las siguientes hipótesis:
+$H_1$ Manteniendo el resto de las variables constantes, mientras más fatiga perciba una persona respecto a su información sobre los avances del coronavirus y sus efectos, menor será el grado de acuerdo con las medidas sanitarias adoptadas por el Gobierno.
+$H_2$ Ceteris paribus, las personas que perciben menores grados de desigualdad en el acceso a protección y salud frente a la pandemia estarán más de acuerdo con las medidas sanitarias adoptadas por el Gobierno.
+$H_3$ Las personas que estiman un bajo nivel de riesgo ante el coronavirus estarán más de acuerdo con las medidas sanitarias adoptadas por el Gobierno, que aquellas personas que estiman un alto nivel de riesgo.
+
+# Metodología
+
+El presente informe trabajó con la base de datos MOVID-IMPACT, que está hecha a partir de la encuesta Movid-Impact producida por el equipo CoV-IMPACT (ANID N°960). Esta encuesta busca dar cuenta de una evaluación transdisciplinaria de las respuestas a la pandemia del COVID-19 y sus consecuencias. La base cuenta con un total de 3569 casos y 168 variables para poder responder a las múltiples dimensiones de la crisis económica y social provocada por la pandemia. Al tomar en cuenta la información de les 1261 encuestades que respondieron a la encuesta, eliminando los casos perdidos respecto a las variables elegidas, se trabajó con un total de 1216 casos.
+
+Para este informe se hizo uso de la siguiente variable dependiente para los modelos de regresión logística:
++ Legitimidad de las medidas sanitarias: Refiere al grado de legitimidad de las medidas sanitarias propuestas por las autoridades sanitarias expresada como variable dicotómica. Fue construida a partir del ítem del cuestionario: “Aunque a veces no estemos de acuerdo con las autoridades sanitarias y las medidas que se proponen, es nuestro deber seguir sus indicaciones al pie de la letra”. En esta variable se agruparon las categorías de “Muy en desacuerdo”, “En desacuerdo” e “Indiferente” en el valor [0] “No de acuerdo” y las categorías en el “De acuerdo” y “Muy de acuerdo” en el valor [1] “De acuerdo”.
+
+Como variables predictoras para los modelos de regresión se consideró:
++ Fatiga en la información sobre el avance del COVID-19: Construida en base a la afirmación “Me informo constantemente sobre los avances del coronavirus y sus efectos en Chile.”. Esta variable incluye cinco categorías, considerando como casos perdidos a las categorías “no sabe” y “no responde”. El valor [1] corresponde a “Muy en desacuerdo”, el valor [2] “En desacuerdo”, el valor [3] “Indiferente”, el valor [4] “De acuerdo”, el valor [5] “Muy de acuerdo”.
++ Percepción de desigualdad en el sistema de salud frente a la Pandemia: Esta variable refiere a la percepción que tienen les encuestades sobre la desigualdad en el acceso a protección y salud frente a la pandemia. Fue construida en base a la afirmación “En Chile hay enormes desigualdades frente a la pandemia: algunas personas están mucho más protegidas y tienen mucho mejor acceso a salud que otras”. Esta variable incluye cinco categorías, considerando como casos perdidos a las categorías “no sabe” y “no responde”. El valor [1] corresponde a “Muy en desacuerdo”, el valor [2] “En desacuerdo”, el valor [3] “Indiferente”, el valor [4] “De acuerdo”, el valor [5] “Muy de acuerdo”.
++ Percepción de riesgo ante el COVID-19: Esta variable refiere a la percepción de riesgo de les encuestades ante el COVID-19. Esta variable incluye cinco categorías, considerando como casos perdidos a las categorías “no sabe” y “no responde”. El valor [1] que es “Nada peligroso”, el valor [2] “Algo peligroso”, el valor [3] “Bastante peligroso”, el valor [4] “Muy peligroso” y el valor [5] “Extremadamente peligroso”. La categoría “Nada peligroso” [1] fue elegida como categoría de referencia en este caso.
+
+Como variables de control:
++ Sexo: Esta variable da cuenta del sexo de la persona bajo las dos opciones “Hombre” [0] y “Mujer” [1]. Se usará de referencia la categoría de “Hombre” [0].
++ Edad: Esta variable da cuenta de la edad del entrevistado en años.
+
+\newpage
+
+# Análisis
+## Análisis descriptivo
+
+```{r descr, echo = F}
+view(dfSummary(proc_movid, headings = FALSE), file = "output/tables/tabla_descr1.html")
+```
+
+```{r tab1, echo = F }
+# se seleccionan y ordenan los datos extraidos de la tabla anterior
+knitr::include_graphics("input/images/tabla_1.png") 
+```
+
+En la Tabla 1 se pueden observar los estadísticos descriptivos principales de cada una de las variables a utilizar. En primer lugar, la mayor parte de la muestra se posiciona en grados de mayor legitimidad de las medidas sanitarias adoptadas por las autoridades sanitarias, pues la variable presenta un 87.7% de la muestra concentrada en “De acuerdo”.
+
+Igualmente, respecto a la variable _Fatiga en la información sobre el avance del COVID-19_, conviene señalar que la mayor parte de la muestra se concentra en las categorías de “De acuerdo” (63.2%) y “Muy de acuerdo” (20.0%). Una distribución similar de los datos se puede observar en la variable percepción de desigualdad frente a la Pandemia, con un 50.7% en la categoría “De acuerdo” y un 32.4% en “Muy de acuerdo”.
+
+En tercer lugar, en cuanto a la variable _Percepción de riesgo ante el COVID-19_, existe una alta dispersión en cuanto a sus resultados, pero que se concentra en las categorías de peligro más altas. La categoría que concentra la mayor cantidad de los resultados corresponde a aquellas que perciben el COVID-19 como “Muy peligroso” (35.1%). A esta categoría le siguen las de “Extremadamente peligroso” (32.1%) y “Bastante peligroso” (21.0%). En menor medida se encuentran las categorías “Algo peligroso” (10.5%) y “Nada peligroso” (1.4%).
+
+
+## Análisis de regresión
+
+```{r factorizar, echo = FALSE}
+proc_movid$sexo<- as_factor(proc_movid$sexo)
+proc_movid$peligro_p<- as_factor(proc_movid$peligro_p)
+proc_movid$informacion<- as_factor(proc_movid$informacion)
+proc_movid$desigualdad_p<- as_factor(proc_movid$desigualdad_p)
+```
+
+```{r modelos, echo=FALSE}
+m01 <- glm(legitimidad~sexo+edad,data = proc_movid,family = "binomial")
+m02 <- glm(legitimidad~sexo+edad+peligro_p, data = proc_movid,family = "binomial")
+m03 <- glm(legitimidad~sexo+edad+desigualdad_p, data = proc_movid,family = "binomial")
+m04 <- glm(legitimidad~sexo+edad+informacion, data = proc_movid,family = "binomial")
+m05 <- glm(legitimidad~sexo+edad+peligro_p+desigualdad_p, data = proc_movid,family = "binomial")
+m06 <- glm(legitimidad~sexo+edad+peligro_p+informacion, data = proc_movid,family = "binomial")
+m07 <- glm(legitimidad~sexo+edad+desigualdad_p+informacion, data = proc_movid,family = "binomial")
+m08 <- glm(legitimidad~sexo+edad+peligro_p+desigualdad_p+informacion, data = proc_movid,family = "binomial")
+
+```
+
 
 # Referencias {-}
 
@@ -42,5 +128,12 @@ En adición a lo anteriormente presentado, el impacto del sexo y la edad en las 
 
 # Anexo {-}
 
+### Anexo 1: Estadísticos descriptivos de las variables de control
 
+```{r descr. control, echo = F}
+movid_control <- proc_movid %>% select(sexo, edad) 
+dfSummary(movid_control, headings = FALSE)
+```
+
+El Anexo 1 muestra los estadísticos descriptivos de las variables de control. En primer lugar, la variable Sexo describe que entre las personas entrevistadas, en un 37.6% serían hombres y un 62.4% serían mujeres. Además, la variable Edad señala que las personas entrevistadas rondan entre los 18 y los 96 años y que el promedio de la muestra es de 48 años.
 
