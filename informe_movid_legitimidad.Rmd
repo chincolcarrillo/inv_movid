@@ -110,6 +110,7 @@ proc_movid$desigualdad_p<- as_factor(proc_movid$desigualdad_p)
 ```
 
 ```{r modelos, echo=FALSE}
+m00 <- glm(legitimidad~1,data = proc_movid,family = "binomial")
 m01 <- glm(legitimidad~sexo+edad,data = proc_movid,family = "binomial")
 m02 <- glm(legitimidad~sexo+edad+peligro_p, data = proc_movid,family = "binomial")
 m03 <- glm(legitimidad~sexo+edad+desigualdad_p, data = proc_movid,family = "binomial")
