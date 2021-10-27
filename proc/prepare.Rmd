@@ -11,7 +11,7 @@ Se realiza un codigo de preparacion de datos para posterior analisis en el infor
 ```{r}
 # install.packages("pacman")
 # library(pacman)
-pacman::p_load(dplyr, summarytools, sjmisc, car, sjlabelled, stargazer, scales)
+pacman::p_load(dplyr, sjmisc, sjlabelled)
 ```
 
 # Data
@@ -22,7 +22,7 @@ Se realizan ajustes generales para trabajar desde RStudio y se carga la base de 
 rm(list=ls())       
 options(scipen=999)   
 
-movid_original <- read.csv("datos/MOVID-IMPACT.csv")
+movid_original <- read.csv('../input/data/original/MOVID-IMPACT.csv')
 ```
 
 Se filtra la base, dejando sólo aquellos casos que respondieron la encuesta. Esto, ya que MOVID-impact es una encuesta transversal a hogares, se registran los datos de todos los miembros del hogar pero sólo uno responde la encuesta completa. 
@@ -36,63 +36,103 @@ proc_movid <- movid_original %>%
 View(proc_movid)
 ```
 
+# Recodificación variables
+
 Se recodifican los valores y casos perdidos de las variables de interés.
 
 ```{r}
 proc_movid$sexo <- recode(proc_movid$sexo, "'Hombre' = 0; 'Mujer' = 1")
 proc_movid$sexo <- as_numeric(proc_movid$sexo)
 
-proc_movid$neduc <- recode(proc_movid$neduc, "'Nunca asistió' = 1; 
-                         'Especial (Diferencial)' = 2;
-                         'Básica' = 2;
-                         'Media Científico-Humanista' = 3;
-                         'Media Técnica-Profesional' = 3;
-                         'Superior Técnica (CFT o I. Profesional)' = 4;
-                         'Superior Universitaria (Pregrado)' = 5;
-                         'Postgrado' = 6;
-                         'No sabe/no responde' = NA")
-
 proc_movid$peligro_p <- recode(proc_movid$peligro_p, "'No sabe' = NA; 'Nada peligroso' = 1;
                         'Algo peligroso' = 2; 'Bastante peligroso' = 3; 'Muy peligroso' = 4;
                         'Extremadamente peligroso' = 5; 'No responde' = NA")
 
-proc_movid$legitimidad <- recode(proc_movid$legitimidad, "'No sabe' = NA; 'No responde' = NA; 
+proc_movid$desigualdad_p <- recode(proc_movid$desigualdad_p, "'No sabe' = NA; 'No responde' = NA; 
                           'Muy en desacuerdo' = 1; 'En desacuerdo' = 2;
                           'Indiferente' = 3; 'De acuerdo' = 4; 'Muy de acuerdo' = 5")
 
-proc_movid$legitimidad_dico <- recode(proc_movid$legitimidad, "'No sabe' = NA; 'No responde' = NA; 
-                          '1' = 0; '2' = 0;
-                          '3' = 0; '4' = 1; '5' = 1")
+proc_movid$informacion <- recode(proc_movid$informacion, "'No sabe' = NA; 'No responde' = NA; 
+                          'Muy en desacuerdo' = 1; 'En desacuerdo' = 2;
+                          'Indiferente' = 3; 'De acuerdo' = 4; 'Muy de acuerdo' = 5")
 
+proc_movid$legitimidad <- recode(proc_movid$legitimidad, "'No sabe' = NA; 'No responde' = NA; 
+                          'Muy en desacuerdo' = 0; 'En desacuerdo' = 0;
+                          'Indiferente' = 0; 'De acuerdo' = 1; 'Muy de acuerdo' = 1")
+
+View(proc_movid)
 ```
 
-Para poder utilizar como variable contínua el ingreso_pp incluso en los casos en que no se respondió el monto exacto de ingreso del hogar, se realiza una aproximación a la marca de clase de cada tramo de ingreso entregado en la variable "tingreso"
-A continuación, se 
+# Etiquetas de variables y valores
+
+A continuación, se cambian las etiquetas de las variables de interés, para posteriores visualizaciones gráficas y tablas. 
 
 ```{r}
-proc_movid <- proc_movid %>%
-  mutate(tingreso = case_when(tingreso == "Menos de $200 mil pesos" ~ 200000,
-                              tingreso == "Entre $200 y 350 mil pesos" ~ 275000,
-                              tingreso == "Entre $351 y 500 mil pesos" ~ 425500,
-                              tingreso == "Entre 501 y 800 mil pesos" ~ 650500,
-                              tingreso == "Entre 801 mil y 1 millón 200 mil pesos" ~ 1000500,
-                              tingreso == "Entre 1 millón 201 mil y 2 millones de pesos" ~ 1600500,
-                              tingreso == "Entre 2 millones y 5 millones de pesos" ~ 3500000,
-                              tingreso == "Más de 5 millones de pesos" ~ 5000000))
+proc_movid$desigualdad_p <- set_label(x = proc_movid$desigualdad_p,label = "Percepción de desigualdad en el sistema de salud frente a la Pandemia")
+proc_movid$informacion <- set_label(x = proc_movid$informacion,label = "Fatiga en la información sobre el avance del COVID-19")
+proc_movid$peligro_p <- set_label(x = proc_movid$peligro_p,label = "Percepción de riesgo ante el COVID-19")
+proc_movid$legitimidad <- set_label(x = proc_movid$legitimidad,label = "Legitimidad de las medidas sanitarias. Expresada de manera dicotomica.")
+proc_movid$sexo <- set_label(x = proc_movid$sexo,label = "Sexo")
+proc_movid$edad <- set_label(x = proc_movid$edad,label = "Edad")
 
-
-proc_movid$ingreso_i <- ifelse(test = (is.na(proc_movid$ingreso)), 
-                               yes = proc_movid$tingreso,         
-                               no = proc_movid$ingreso)     
+# revisar
+sjlabelled::get_label(proc_movid)
 ```
 
-Finalmente se crea la variable ingreso_pp dividiendo el ingreso_i del hogar por las personas que componen el hogar
+Se ajustan las etiquetas de los valores de las variables.
 
 ```{r}
-proc_movid$ingreso_pp <- proc_movid$ingreso_i/proc_movid$familia
+proc_movid$sexo <- set_labels(proc_movid$sexo, labels=c( "Hombre" = 0, "Mujer" = 1))
+
+proc_movid$legitimidad <- set_labels(proc_movid$legitimidad, 
+                                          labels=c( "En desacuerdo" = 0, "De acuerdo" = 1))
+
+proc_movid$desigualdad_p <- set_labels(proc_movid$desigualdad_p,
+                               labels=c( "Muy en desacuerdo"=1,
+                                         "En desacuerdo"=2,
+                                         "Indiferente"=3,
+                                         "De acuerdo"=4,
+                                         "Muy de acuerdo"=5))
+
+proc_movid$informacion <- set_labels(proc_movid$informacion,
+                                       labels=c( "Muy en desacuerdo"=1,
+                                                 "En desacuerdo"=2,
+                                                 "Indiferente"=3,
+                                                 "De acuerdo"=4,
+                                                 "Muy de acuerdo"=5))
+
+
+proc_movid$peligro_p <- set_labels(proc_movid$peligro_p,
+                                   labels=c( "Nada"=1,
+                                             "Algo"=2,
+                                             "Bastante"=3,
+                                             "Mucho"=4,
+                                             "Extremadamente"=5))
+
+# revisar
+sjlabelled::get_labels(proc_movid)
+
 ```
+
+# Configuración de base de datos para el análisis
+
+Se eliminan los casos perdidos para realizar el análisis.
+```{r}
+proc_movid <-na.omit(proc_movid)
+```
+
+Se guarda la base en la carpeta de 'data proc' del proyecto
+```{r}
+save(proc_movid,file = "../input/data/proc/proc_movid.RData")
+```
+
 
 # Información de la sesión
+Para realizar esta preparación de datos se emplearon:
+R 4.1.1
+dplyr 1.0.7
+sjlabelled 1.1.8
+sjmisc 2.8.7
 
 ```{r}
 print(paste("R", getRversion()))
@@ -102,3 +142,4 @@ for (package_name in sort(loadedNamespaces())) {
 }
 
 ```
+
