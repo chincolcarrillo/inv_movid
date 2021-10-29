@@ -1,0 +1,71 @@
+---
+title: "Codigo de análisis exploratorio movid_legitimidad"
+---
+
+# Descripción general
+
+Se realiza un codigo de preparacion de datos para posterior analisis en el informe final movid_legitimidad.
+
+# Librerías
+
+```{r}
+# install.packages("pacman")
+# library(pacman)
+pacman::p_load(dplyr, sjmisc, sjlabelled)
+remotes::install_github("leifeld/texreg")
+```
+
+
+# Análisis descriptivo 
+```{r descr, echo = F}
+View(dfSummary(proc_movid, headings = FALSE), file = "output/tables/tabla_descr1.html")
+```
+
+
+# Exploración de modelos logísticos
+### Ajustes
+```{r factorizar, echo = FALSE}
+proc_movid$sexo<- as_factor(proc_movid$sexo)
+proc_movid$peligro_p<- as_factor(proc_movid$peligro_p)
+proc_movid$informacion<- as_factor(proc_movid$informacion)
+proc_movid$desigualdad_p<- as_factor(proc_movid$desigualdad_p)
+```
+
+### Ajuste modelos
+```{r modelos, }
+m00 <- glm(legitimidad~1,data = proc_movid,family = "binomial")
+m01 <- glm(legitimidad~sexo+edad,data = proc_movid,family = "binomial")
+m02 <- glm(legitimidad~sexo+edad+peligro_p, data = proc_movid,family = "binomial")
+m03 <- glm(legitimidad~sexo+edad+desigualdad_p, data = proc_movid,family = "binomial")
+m04 <- glm(legitimidad~sexo+edad+informacion, data = proc_movid,family = "binomial")
+m05 <- glm(legitimidad~sexo+edad+peligro_p+desigualdad_p, data = proc_movid,family = "binomial")
+m06 <- glm(legitimidad~sexo+edad+peligro_p+informacion, data = proc_movid,family = "binomial")
+m07 <- glm(legitimidad~sexo+edad+desigualdad_p+informacion, data = proc_movid,family = "binomial")
+m08 <- glm(legitimidad~sexo+edad+peligro_p+desigualdad_p+informacion, data = proc_movid,family = "binomial")
+
+```
+
+Tabular para comparación:
+```{r}
+sjPlot::tab_model(list(m01, m02, m03, m04, m05, m06, m07, m08),
+                  show.se=TRUE,
+                  show.ci=FALSE,
+                  digits=3,
+                  p.style = "stars",
+                  dv.labels = c("Modelo 1", "Modelo 2", "Modelo 3", "Modelo 4", "Modelo 5", "Modelo 6", "Modelo 7", "Modelo 8"),
+                  string.pred = "Predictores",
+                  string.est = "β", file = "modelo_tabla_3.html")
+```
+
+Los modelos 5 (percepción de riesgo + percepción de desigualdad) y 8 (modelo completo) son los modelos con mayor ajuste (R2Tjur>0.02). Sin embargo, se observa que ningún modelo tiene un ajuste suficiente.
+
+La inclusión de la variable de desgaste en la información al modelo sólo mejora el ajuste en un 0.004%
+
+
+
+```{r results='asis', echo=FALSE}
+texreg(list(m01,m02,m03))
+```
+
+
+

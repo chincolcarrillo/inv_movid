@@ -23,9 +23,11 @@ knitr::opts_chunk$set(comment=NA, prompt=FALSE, cache=FALSE, echo=TRUE, results=
 # install.packages("pacman")
 # library(pacman)
 pacman::p_load(dplyr, stargazer, summarytools, kableExtra,
-               sjmisc, sjPlot, ggpubr, gridExtra, webshot,
+               sjmisc, sjPlot, sjlabelled, ggpubr, gridExtra, webshot,
                corrplot, texreg, ggmosaic, finalfit,
                DescTools)
+# remotes::install_github("leifeld/texreg")
+
 # 2. Cargar base de datos
 rm(list = ls())
 options(scipen=999)
@@ -84,12 +86,8 @@ Como variables de control:
 # Análisis
 ## Análisis descriptivo
 
-```{r descr, echo = F}
-view(dfSummary(proc_movid, headings = FALSE), file = "output/tables/tabla_descr1.html")
-```
-
 ```{r tab1, echo = F }
-# se seleccionan y ordenan los datos extraidos de la tabla anterior
+# se seleccionan y ordenan los datos extraidos de la tabla en el archivo de analisis exploratorio
 knitr::include_graphics("input/images/tabla_1.png") 
 ```
 
@@ -110,6 +108,7 @@ proc_movid$desigualdad_p<- as_factor(proc_movid$desigualdad_p)
 ```
 
 ```{r modelos, echo=FALSE}
+# Calcular modelos
 m00 <- glm(legitimidad~1,data = proc_movid,family = "binomial")
 m01 <- glm(legitimidad~sexo+edad,data = proc_movid,family = "binomial")
 m02 <- glm(legitimidad~sexo+edad+peligro_p, data = proc_movid,family = "binomial")
@@ -120,14 +119,95 @@ m06 <- glm(legitimidad~sexo+edad+peligro_p+informacion, data = proc_movid,family
 m07 <- glm(legitimidad~sexo+edad+desigualdad_p+informacion, data = proc_movid,family = "binomial")
 m08 <- glm(legitimidad~sexo+edad+peligro_p+desigualdad_p+informacion, data = proc_movid,family = "binomial")
 
+# Test de razon de verosimilitud
+test00<- anova(m00,m00,test = "Chisq")
+test01<- anova(m00,m01,test = "Chisq")
+test02<- anova(m00,m02,test = "Chisq")
+test03<- anova(m00,m03,test = "Chisq")
+test04<- anova(m00,m04,test = "Chisq")
+test05<- anova(m00,m05,test = "Chisq")
+test06<- anova(m00,m06,test = "Chisq")
+test07<- anova(m00,m07,test = "Chisq")
+test08<- anova(m00,m08,test = "Chisq")
+
+# Guardar valores p
+test.pvalues0<- test00$`Pr(>Chi)`[2]
+test.pvalues1<- test01$`Pr(>Chi)`[2]
+test.pvalues2<- test02$`Pr(>Chi)`[2]
+test.pvalues3<- test03$`Pr(>Chi)`[2]
+test.pvalues4<- test04$`Pr(>Chi)`[2]
+test.pvalues5<- test05$`Pr(>Chi)`[2]
+test.pvalues6<- test06$`Pr(>Chi)`[2]
+test.pvalues7<- test07$`Pr(>Chi)`[2]
+test.pvalues8<- test08$`Pr(>Chi)`[2]
+
+# Pseudo-R2 de McFadden
+mfr2.00 <- DescTools::PseudoR2(m00)
+mfr2.01 <- DescTools::PseudoR2(m01)
+mfr2.02 <- DescTools::PseudoR2(m02)
+mfr2.03 <- DescTools::PseudoR2(m03)
+mfr2.04 <- DescTools::PseudoR2(m04)
+mfr2.05 <- DescTools::PseudoR2(m05)
+mfr2.06 <- DescTools::PseudoR2(m06)
+mfr2.07 <- DescTools::PseudoR2(m07)
+mfr2.08 <- DescTools::PseudoR2(m08)
+
+# Convertir a OR modelos seleccionados
+or1 <- texreg::extract(m01)
+or5 <- texreg::extract(m05) 
+or8 <- texreg::extract(m08)
+or1@coef <- exp(or1@coef)
+or5@coef <- exp(or5@coef)
+or8@coef <- exp(or8@coef)
+
 ```
 
+En la siguiente tabla de modelos de regresión logística se pueden visualizar el modelo nulo (Modelo 0), el modelo controlado por sexo y edad (Modelo 1), un modelo parcial (Modelo 5) y el modelo completo (Modelo 8). El modelo nulo solo toma en cuenta la variable dependiente y no considera ninguna variable predictiva. Mientras que el Modelo 1, contempla las variables control de este estudio, seleccionadas según su pertinencia teórica. En tanto, el Modelo 5 y el Modelo 8 fueron seleccionados por ser los modelos con mejor ajuste tras comparar los estadísticos de ajuste (Pseudo R2 de McFadden, Test de Razón de Verosimilitud y Criterio de Información de Akaike) entre los modelos progresivos (ver Anexo).
 
-# Referencias {-}
+```{r results='asis', echo=FALSE}
+texreg(l = list(m00,m01,or1,m05,or5,m08,or8), 
+       override.coef = list(coef(m00), coef(m01), or1@coef, coef(m05), or5@coef, coef(m08), or8@coef),
+       custom.gof.rows=list("Deviance Test ($p$)" = c(test.pvalues0,
+                                                      test.pvalues1,
+                                                       test.pvalues1,
+                                                      test.pvalues5,
+                                                       test.pvalues5, 
+                                                      test.pvalues8,
+                                                       test.pvalues8),
+                             "Pseudo R2" = c(mfr2.00,mfr2.01,mfr2.01,
+                                             mfr2.05,mfr2.05,mfr2.08,mfr2.08)),
+        custom.coef.names=c("Intercepto","Sexo (Mujer=1)","Edad","Riesgo: Algo", "Riesgo: Bastante", "Riesgo: Mucho", "Riesgo: Extremadamente", "Desigualdad: En desacuerdo", "Desigualdad: Indiferente", "Desigualdad: De acuerdo","Desigualdad: Muy de acuerdo", "Información: En desacuerdo", "Información: Indiferente", "Información: De acuerdo","Información: Muy de acuerdo"),
+        custom.model.names = c("Modelo 0","Modelo 1", "OR", "Modelo 5", "OR","Modelo 8", "OR"),
+       caption = "Modelos de regresión logística (selección)", caption.above = T,
+       float.pos = "h")
+
+```
+
+Si bien se debe señalar que tanto el Modelo 5 como el Modelo 8 tienen un mejor ajuste que el modelo nulo, y esta diferencia es significativa ( _p_ del test de razón de verosimilitud < 0.05), el ajuste global de estos modelos es muy bajo (Pseudo R2 = 0.03). 
+
+Por otro lado, se puede observar que en el caso de la variable _percepción de desigualdad en el sistema de salud frente a la Pandemia_, el modelo completo señala que los Odds-ratio de la categoría _muy de acuerdo_ son estadísticamente significativos con un p < 0.05. Respecto a este resultado, se interpreta que aquellas personas que están muy de acuerdo con la existencia de desigualdad en el sistema de salud frente a la Pandemia tienen una probabilidad 2.91 veces mayor de considerar que las medidas sanitarias adoptadas por el gobierno son legítimas, que las personas que están muy en desacuerdo con dicha afirmación. Este efecto lleva a rechazar la segunda hipótesis propuesta en este estudio.
+De igual forma, los resultados estadísticamente significativos en el modelo completo respecto a la variable de _percepción de riesgo ante el COVID-19_ llevan a rechazar la tercera hipótesis del estudio
+
+\newpage
+
+# Discusión
+El objetivo general de esta investigación es analizar el efecto de la fatiga en la información sobre el avance del COVID-19, la percepción de desigualdad en el sistema de salud frente a la Pandemia y la percepción de riesgo ante el COVID-19, en la legitimidad de las medidas sanitarias gubernamentales. Considerando esto, se puede afirmar que a partir de los resultados presentados a lo largo del informe, no se puede concluir que ninguna de las tres hipótesis planteadas se cumple de manera estadísticamente significativa. 
+Respecto a la primera hipótesis, que a más fatiga perciba una persona respecto a su información sobre los avances del coronavirus y sus efectos, menor será el grado de acuerdo con las medidas sanitarias adoptadas por el Gobierno; considerando que las diferencias de ajuste entre el Modelo 5 y el Modelo 8 no son significativas, se concluye que la variable de fatiga en la información sobre el avance del COVID-19 no tiene efectos sustanciales en la legitimidad de las medidas sanitarias gubernamentales. 
+En cuanto a las variables de percepción de desigualdad en el sistema de salud frente a la Pandemia y la percepción de riesgo ante el COVID-19, se pudieron identificar efectos significativos con un 95% de confianza en el modelo, señalando un efecto positivo sobre la legitimidad de las medias sanitarias tomadas por el gobierno. En esta línea, se rechanzan la segunda y tercera hipótesis de este estudio. A pesar de lo anterior, se considera que este hallazgo no aporta a una mejor comprensión del fenómeno de la legitimidad de las medidas sanitarias ni de la gobernanza en tiempos de crisis sanitaria, ya que el mejor modelo de regresión logística estimado apenas tiene un ajuste del 3% (Pseudo R2 = 0.03). 
+
+A partir de estos resultados, es posible plantear la idea de que, la alta concentración de personas que perciben un alto grado de riesgo ante el Coronavirus y su relación con la aceptación con las medidas del gobierno puede ser interpretado como que el gobierno ha cumplido en esta dimensión de salida su rol de dirigir y hacer llegar los riesgos del COVID-19 hacia la población. En este sentido, la variable puede responder a un constructo diferente al propuesto en esta investigación, y se propone explorar esta arista sobre la comunicación de riesgo en el futuo. Ahora bien, la elaboración de este esquema nos invita a incorporar nuevas variables para estudios futuros. Así, sería de sumo interés, por ejemplo, indagar más respecto a variables que vinculen las legitimacy throughput para así evidenciar que factores institucionales influyen en la confianza y la imparcialidad dentro de la legitimidad del gobierno. Además, los antecedentes de los países que pudieron afrontar de mejor manera esta pandemia, destacan de igual forma la importancia del manejo de los recursos por parte del gobierno, para lo cual resultaría pertinente vincular la legitimidad del gobierno con variables socioeconómicas. Durante las épocas más críticas de la pandemia, desde el gobierno se impulsaron políticas de apoyo económico a través de caja de mercadería, lo cual no fue de total agrado por parte de la población y podría ser un factor a vincular con respecto a la legitimidad del gobierno.
+
+
+\newpage
+
+# Referencias 
 
 <div id="refs"></div>
 
-# Anexo {-}
+
+\newpage
+
+# Anexo 
 
 ### Anexo 1: Estadísticos descriptivos de las variables de control
 
@@ -137,4 +217,21 @@ dfSummary(movid_control, headings = FALSE)
 ```
 
 El Anexo 1 muestra los estadísticos descriptivos de las variables de control. En primer lugar, la variable Sexo describe que entre las personas entrevistadas, en un 37.6% serían hombres y un 62.4% serían mujeres. Además, la variable Edad señala que las personas entrevistadas rondan entre los 18 y los 96 años y que el promedio de la muestra es de 48 años.
+
+
+### Anexo 2: Modelos de regresión logística (no seleccionados)
+
+```{r, results='asis', echo=FALSE}
+texreg(l = list(m02,m03,m04,m06,m07),
+       custom.gof.rows=list("Deviance Test ($p$)" = c(test.pvalues2,
+                                                      test.pvalues3,
+                                                       test.pvalues4,
+                                                      test.pvalues6,
+                                                       test.pvalues7),
+                             "Pseudo R2" = c(mfr2.02,mfr2.03,mfr2.04,
+                                             mfr2.06,mfr2.07)),
+        custom.coef.names=c("Intercepto","Sexo (Mujer=1)","Edad","Riesgo: Algo", "Riesgo: Bastante", "Riesgo: Mucho", "Riesgo: Extremadamente", "Desigualdad: En desacuerdo", "Desigualdad: Indiferente", "Desigualdad: De acuerdo","Desigualdad: Muy de acuerdo", "Información: En desacuerdo", "Información: Indiferente", "Información: De acuerdo","Información: Muy de acuerdo"),
+        custom.model.names = c("Modelo 2", "Modelo 3", "Modelo 4", "Modelo 6", "Modelo 7"),
+       caption = "")
+```
 
