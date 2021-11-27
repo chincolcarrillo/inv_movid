@@ -8,17 +8,24 @@ Se realiza un codigo de preparacion de datos para posterior analisis en el infor
 
 # Librerías
 
-```{r}
+```{r librerias}
 # install.packages("pacman")
 # library(pacman)
-pacman::p_load(dplyr, sjmisc, sjlabelled)
-remotes::install_github("leifeld/texreg")
+pacman::p_load(dplyr, sjmisc, sjlabelled, summarytools, pander)
+# remotes::install_github("leifeld/texreg", force = TRUE)
+```
+# Datos
+```{r datos}
+# 2. Cargar base de datos
+rm(list = ls())
+options(scipen=999)
+load("../input/data/proc/proc_movid.RData")
 ```
 
 
 # Análisis descriptivo 
 ```{r descr, echo = F}
-View(dfSummary(proc_movid, headings = FALSE), file = "output/tables/tabla_descr1.html")
+view(dfSummary(proc_movid, headings = FALSE), file = "../output/tables/tabla_descr_1.html")
 ```
 
 
@@ -54,7 +61,7 @@ sjPlot::tab_model(list(m01, m02, m03, m04, m05, m06, m07, m08),
                   p.style = "stars",
                   dv.labels = c("Modelo 1", "Modelo 2", "Modelo 3", "Modelo 4", "Modelo 5", "Modelo 6", "Modelo 7", "Modelo 8"),
                   string.pred = "Predictores",
-                  string.est = "β", file = "modelo_tabla_3.html")
+                  string.est = "β", file = "../output/tables/modelo_tabla_3.html")
 ```
 
 Los modelos 5 (percepción de riesgo + percepción de desigualdad) y 8 (modelo completo) son los modelos con mayor ajuste (R2Tjur>0.02). Sin embargo, se observa que ningún modelo tiene un ajuste suficiente.

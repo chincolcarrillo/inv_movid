@@ -41,24 +41,27 @@ View(proc_movid)
 Se recodifican los valores y casos perdidos de las variables de interés.
 
 ```{r}
-proc_movid$sexo <- recode(proc_movid$sexo, "'Hombre' = 0; 'Mujer' = 1")
+proc_movid$sexo <- recode(proc_movid$sexo, 'Hombre' = 0, 'Mujer' = 1)
 proc_movid$sexo <- as_numeric(proc_movid$sexo)
 
-proc_movid$peligro_p <- recode(proc_movid$peligro_p, "'No sabe' = NA; 'Nada peligroso' = 1;
-                        'Algo peligroso' = 2; 'Bastante peligroso' = 3; 'Muy peligroso' = 4;
-                        'Extremadamente peligroso' = 5; 'No responde' = NA")
+proc_movid$peligro_p <- recode(proc_movid$peligro_p, 'No sabe' = NA_real_, 'Nada peligroso' = 1,
+                        'Algo peligroso' = 2, 'Bastante peligroso' = 3, 'Muy peligroso' = 4,
+                        'Extremadamente peligroso' = 5, 'No responde' = NA_real_)  
 
-proc_movid$desigualdad_p <- recode(proc_movid$desigualdad_p, "'No sabe' = NA; 'No responde' = NA; 
-                          'Muy en desacuerdo' = 1; 'En desacuerdo' = 2;
-                          'Indiferente' = 3; 'De acuerdo' = 4; 'Muy de acuerdo' = 5")
+proc_movid$desigualdad_p <- recode(proc_movid$desigualdad_p, 'No sabe' = NA_real_, 
+                                   'No responde' = NA_real_, 'Muy en desacuerdo' = 1,
+                                   'En desacuerdo' = 2, 'Indiferente' = 3, 
+                                   'De acuerdo' = 4, 'Muy de acuerdo' = 5)
 
-proc_movid$informacion <- recode(proc_movid$informacion, "'No sabe' = NA; 'No responde' = NA; 
-                          'Muy en desacuerdo' = 1; 'En desacuerdo' = 2;
-                          'Indiferente' = 3; 'De acuerdo' = 4; 'Muy de acuerdo' = 5")
+proc_movid$informacion <- recode(proc_movid$informacion, 'No sabe' = NA_real_, 
+                                   'No responde' = NA_real_, 'Muy en desacuerdo' = 1,
+                                   'En desacuerdo' = 2, 'Indiferente' = 3, 
+                                   'De acuerdo' = 4, 'Muy de acuerdo' = 5)
 
-proc_movid$legitimidad <- recode(proc_movid$legitimidad, "'No sabe' = NA; 'No responde' = NA; 
-                          'Muy en desacuerdo' = 0; 'En desacuerdo' = 0;
-                          'Indiferente' = 0; 'De acuerdo' = 1; 'Muy de acuerdo' = 1")
+proc_movid$legitimidad <- recode(proc_movid$legitimidad, 'No sabe' = NA_real_, 
+                                 'No responde' = NA_real_, 'Muy en desacuerdo' = 0,
+                                 'En desacuerdo' = 0, 'Indiferente' = 0, 
+                                 'De acuerdo' = 1, 'Muy de acuerdo' = 1)
 
 View(proc_movid)
 ```

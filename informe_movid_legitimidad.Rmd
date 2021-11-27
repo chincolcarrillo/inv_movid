@@ -26,7 +26,7 @@ pacman::p_load(dplyr, stargazer, summarytools, kableExtra,
                sjmisc, sjPlot, sjlabelled, ggpubr, gridExtra, webshot,
                corrplot, texreg, ggmosaic, finalfit,
                DescTools)
-# remotes::install_github("leifeld/texreg")
+remotes::install_github("leifeld/texreg")
 
 # 2. Cargar base de datos
 rm(list = ls())
@@ -179,6 +179,7 @@ texreg(l = list(m00,m01,or1,m05,or5,m08,or8),
         custom.coef.names=c("Intercepto","Sexo (Mujer=1)","Edad","Riesgo: Algo", "Riesgo: Bastante", "Riesgo: Mucho", "Riesgo: Extremadamente", "Desigualdad: En desacuerdo", "Desigualdad: Indiferente", "Desigualdad: De acuerdo","Desigualdad: Muy de acuerdo", "Información: En desacuerdo", "Información: Indiferente", "Información: De acuerdo","Información: Muy de acuerdo"),
         custom.model.names = c("Modelo 0","Modelo 1", "OR", "Modelo 5", "OR","Modelo 8", "OR"),
        caption = "Modelos de regresión logística (selección)", caption.above = T,
+       fontsize = "small",
        float.pos = "h")
 
 ```
